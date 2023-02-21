@@ -3,6 +3,13 @@
 yep, that's that.
 Work less, sail more.
 
+## The concept
+
+The ESP8266 has a builtin wifi module that can be used to access a smartphones hotspot network.
+Thereby creating a direct, fast connection that, in the open, can reach for 100 meters and more.
+
+The ESP8266 then can gernate a website through with the ship can be steered.
+
 ## Material used
 
 1. Standard RC sailboat (1 servo to set the sails, 1 servo for steering)

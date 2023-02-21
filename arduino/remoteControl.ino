@@ -22,8 +22,8 @@ int steeringSetting = 90;
 // ----------------
 // Set your WiFi SSID and Password here
 // ----------------
-const char *ssid = "xxxxxxxxx";
-const char *password = "xxxxxxxxx";
+const char *ssid = "iPhone von Jonas";
+const char *password = "12345678";
 
 ESP8266WebServer server(80);
 
