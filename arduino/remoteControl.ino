@@ -13,17 +13,17 @@ Servo sails;
 
 int sailPower = 10;
 
-int sailSetting = 0;
+int sailSetting = 90;
 
-int steeringPower = 10;
+int rudderPower = 10;
 
-int steeringSetting = 90;
+int rudderSetting = 90;
 
 // ----------------
 // Set your WiFi SSID and Password here
 // ----------------
-const char *ssid = "iPhone von Jonas";
-const char *password = "12345678";
+const char *ssid = "XXXXX";
+const char *password = "YYYYY";
 
 ESP8266WebServer server(80);
 
@@ -66,6 +66,9 @@ void setup(void)
 
   rudder.attach(servoPin);
   sails.attach(sailsPin);
+  rudder.write(rudderSetting);
+  sails.write(sailSetting);
+  delay(15);
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
@@ -91,6 +94,7 @@ void setup(void)
     sailSetting += sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
+    delay(15);
     Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting - sailPower) + " to " + String(sailSetting));
     server.send(200, "text/plain", "forward"); });
 
@@ -104,23 +108,26 @@ void setup(void)
     sailSetting -= sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
+    delay(15);
     Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting + sailPower) + " to " + String(sailSetting));
     server.send(200, "text/plain", "back"); });
 
   server.on("/right", []()
             {
-    steeringSetting += steeringPower;
-    steeringSetting = constrain(steeringSetting, 0, 180);
-    rudder.write(steeringSetting);
-    Serial.println("Set rudder to the right by : " + String(steeringPower) + " from " + String(steeringSetting - steeringPower) + " to " + String(steeringSetting));
+    rudderSetting += rudderPower;
+    rudderSetting = constrain(rudderSetting, 0, 180);
+    rudder.write(rudderSetting);
+    delay(15);
+    Serial.println("Set rudder to the right by : " + String(rudderPower) + " from " + String(rudderSetting - rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", "right"); });
 
   server.on("/left", []()
             {
-    steeringSetting -= steeringPower;
-    steeringSetting = constrain(steeringSetting, 0, 180);
-    rudder.write(steeringSetting);
-    Serial.println("Set rudder to the left : " + String(steeringPower) + " from " + String(steeringSetting + steeringPower) + " to " + String(steeringSetting));
+    rudderSetting -= rudderPower;
+    rudderSetting = constrain(rudderSetting, 0, 180);
+    rudder.write(rudderSetting);
+    delay(15);
+    Serial.println("Set rudder to the left : " + String(rudderPower) + " from " + String(rudderSetting + rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", "left"); });
 
   server.on("/steerStop", []()
