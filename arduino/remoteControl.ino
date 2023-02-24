@@ -98,7 +98,7 @@ void setup(void)
     String response = String(rudderSetting);
     server.send(200, "text/plain", response); });
 
-  server.on("/forward", []()
+  server.on("/reach", []()
             {
     sailSetting += sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
@@ -107,7 +107,7 @@ void setup(void)
     Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting - sailPower) + " to " + String(sailSetting));
     server.send(200, "text/plain", String(sailSetting)); });
 
-  server.on("/back", []()
+  server.on("/run", []()
             {
     sailSetting -= sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
@@ -116,7 +116,7 @@ void setup(void)
     Serial.println("Open the sails by: " + String(sailPower) + " from " + String(sailSetting + sailPower) + " to " + String(sailSetting));
     server.send(200, "text/plain", String(sailSetting)); });
 
-  server.on("/right", []()
+  server.on("/starboard", []()
             {
     rudderSetting += rudderPower;
     rudderSetting = constrain(rudderSetting, 0, 180);
@@ -125,7 +125,7 @@ void setup(void)
     Serial.println("Set rudder to the right by : " + String(rudderPower) + " from " + String(rudderSetting - rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", String(rudderSetting)); });
 
-  server.on("/left", []()
+  server.on("/port", []()
             {
     rudderSetting -= rudderPower;
     rudderSetting = constrain(rudderSetting, 0, 180);
