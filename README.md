@@ -10,6 +10,8 @@ Thereby creating a direct, fast connection that, in the open, can reach for 100 
 
 The ESP8266 then can gernate a website through with the ship can be steered.
 
+However as it turned out, a mobile hotspot slows communication down massively, thus a real wifi network is required.
+
 ## Material used
 
 1. Standard RC sailboat (1 servo to set the sails, 1 servo for steering)

@@ -33,7 +33,6 @@ const char *webpage =
 
 void handleRoot()
 {
-
   server.send(200, "text/html", webpage);
 }
 
@@ -68,7 +67,7 @@ void setup(void)
   sails.attach(sailsPin);
   rudder.write(rudderSetting);
   sails.write(sailSetting);
-  delay(15);
+  // delay(15);
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
@@ -89,51 +88,51 @@ void setup(void)
 
   server.on("/", handleRoot);
 
+  server.on("/sailSetting", []()
+            {
+    String response = String(sailSetting);
+    server.send(200, "text/plain", response); });
+
+  server.on("/rudderSetting", []()
+            {
+    String response = String(rudderSetting);
+    server.send(200, "text/plain", response); });
+
   server.on("/forward", []()
             {
     sailSetting += sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
-    delay(15);
+    //delay(15);
     Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting - sailPower) + " to " + String(sailSetting));
-    server.send(200, "text/plain", "forward"); });
-
-  server.on("/driveStop", []()
-            {
-    Serial.println("driveStop");
-    server.send(200, "text/plain", "driveStop"); });
+    server.send(200, "text/plain", String(sailSetting)); });
 
   server.on("/back", []()
             {
     sailSetting -= sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
-    delay(15);
-    Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting + sailPower) + " to " + String(sailSetting));
-    server.send(200, "text/plain", "back"); });
+    //delay(15);
+    Serial.println("Open the sails by: " + String(sailPower) + " from " + String(sailSetting + sailPower) + " to " + String(sailSetting));
+    server.send(200, "text/plain", String(sailSetting)); });
 
   server.on("/right", []()
             {
     rudderSetting += rudderPower;
     rudderSetting = constrain(rudderSetting, 0, 180);
     rudder.write(rudderSetting);
-    delay(15);
+    //delay(15);
     Serial.println("Set rudder to the right by : " + String(rudderPower) + " from " + String(rudderSetting - rudderPower) + " to " + String(rudderSetting));
-    server.send(200, "text/plain", "right"); });
+    server.send(200, "text/plain", String(rudderSetting)); });
 
   server.on("/left", []()
             {
     rudderSetting -= rudderPower;
     rudderSetting = constrain(rudderSetting, 0, 180);
     rudder.write(rudderSetting);
-    delay(15);
+    //delay(15);
     Serial.println("Set rudder to the left : " + String(rudderPower) + " from " + String(rudderSetting + rudderPower) + " to " + String(rudderSetting));
-    server.send(200, "text/plain", "left"); });
-
-  server.on("/steerStop", []()
-            {
-    Serial.println("steerStop");
-    server.send(200, "text/plain", "steerStop"); });
+    server.send(200, "text/plain", String(rudderSetting)); });
 
   server.onNotFound(handleNotFound);
 
