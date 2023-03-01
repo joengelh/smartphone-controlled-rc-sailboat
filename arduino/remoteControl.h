@@ -66,6 +66,19 @@ R"(
     </script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script> function makeAjaxCall(url){$.ajax({"url": url})}</script>
+    <script>
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "w") {
+        makeAjaxCall("reach");
+      } else if (event.key === "a") {
+        makeAjaxCall("port");
+      } else if (event.key === "s") {
+        makeAjaxCall("run");
+      } else if (event.key === "d") {
+        makeAjaxCall("starboard");
+      }
+    });
+    </script>
   </head>
   <body>
     <h1>Boat Control</h1>
