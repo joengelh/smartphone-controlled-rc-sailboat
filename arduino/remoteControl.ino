@@ -67,7 +67,6 @@ void setup(void)
   sails.attach(sailsPin);
   rudder.write(rudderSetting);
   sails.write(sailSetting);
-  // delay(15);
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
@@ -103,7 +102,6 @@ void setup(void)
     sailSetting += sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
-    //delay(15);
     Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting - sailPower) + " to " + String(sailSetting));
     server.send(200, "text/plain", String(sailSetting)); });
 
@@ -112,7 +110,6 @@ void setup(void)
     sailSetting -= sailPower;
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
-    //delay(15);
     Serial.println("Open the sails by: " + String(sailPower) + " from " + String(sailSetting + sailPower) + " to " + String(sailSetting));
     server.send(200, "text/plain", String(sailSetting)); });
 
@@ -121,7 +118,6 @@ void setup(void)
     rudderSetting += rudderPower;
     rudderSetting = constrain(rudderSetting, 0, 180);
     rudder.write(rudderSetting);
-    //delay(15);
     Serial.println("Set rudder to the right by : " + String(rudderPower) + " from " + String(rudderSetting - rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", String(rudderSetting)); });
 
@@ -130,7 +126,6 @@ void setup(void)
     rudderSetting -= rudderPower;
     rudderSetting = constrain(rudderSetting, 0, 180);
     rudder.write(rudderSetting);
-    //delay(15);
     Serial.println("Set rudder to the left : " + String(rudderPower) + " from " + String(rudderSetting + rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", String(rudderSetting)); });
 
