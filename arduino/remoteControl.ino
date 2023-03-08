@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <Servo.h>
+#include <ArduinoJson.h>
 
 // Replace with your servo pin
 int servoPin = 5;
@@ -30,6 +31,39 @@ ESP8266WebServer server(80);
 const char *webpage =
 #include "webPage.h"
     ;
+
+// Define a global variable to store the coordinates
+float coordinates[10];
+
+void handleCoordinates()
+{
+  // Flush the coordinates array
+  for (int i = 0; i < 10; i++)
+  {
+    coordinates[i] = 0;
+  }
+
+  // Parse the JSON data from the request body
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, server.arg("plain"));
+
+  // If the JSON is invalid, return a 400 Bad Request error
+  if (error)
+  {
+    server.send(400, "text/plain", "Invalid JSON");
+    return;
+  }
+
+  // Extract the coordinates from the JSON object and store them in the global variable
+  JsonArray arr = doc.as<JsonArray>();
+  for (int i = 0; i < arr.size(); i++)
+  {
+    coordinates[i] = arr[i];
+  }
+
+  // Send a success response
+  server.send(200, "text/plain", "Coordinates saved");
+}
 
 void handleRoot()
 {
@@ -128,6 +162,31 @@ void setup(void)
     rudder.write(rudderSetting);
     Serial.println("Set rudder to the left : " + String(rudderPower) + " from " + String(rudderSetting + rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", String(rudderSetting)); });
+
+  server.onNotFound(handleNotFound);
+
+  server.on("/data", []()
+            {
+    StaticJsonDocument<200> data;
+
+    Serial.println("Data requested");
+    data["rudderSetting"] = rudderSetting;
+    data["rudderPower"] = rudderPower;
+    data["sailSetting"] = sailSetting;
+    data["sailPower"] = sailPower;
+
+    // Serialize the JSON object to a string
+    String jsonString;
+    serializeJson(data, jsonString);
+
+    // Set the content type to JSON
+    server.sendHeader("Content-Type", "application/json");
+
+    // Send the JSON data as the response
+    server.send(200, "application/json", jsonString); });
+
+  // Register the endpoint for the coordinates
+  server.on("/coordinates", HTTP_POST, handleCoordinates);
 
   server.onNotFound(handleNotFound);
 
