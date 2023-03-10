@@ -2,7 +2,7 @@ R"(
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manual and Autopilot Selection</title>
+    <title>Manual and waypoint Selection</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <style>
         body {
@@ -19,34 +19,35 @@ R"(
 
         .btn-manual {
             color: black;
+            background-color: #dc3545;
+        }
+
+        .btn-waypoint {
+            color: black;
+            background-color: #106f0a;
+        }
+        
+        .btn-heading {
+            color: black;
             background-color: #FFD700;
         }
-
-        .btn-autopilot {
-            color: black;
-            background-color: #1E90FF;
-        }
-
+        
         .btn-danger {
             color: white;
             background-color: #dc3545;
         }
 
         button {
-            border-radius: 10px;
+            border-radius: 20px;
         }
         
         .btn {
-            width: 80%;
+            width: 90%;
             height: 150px;
             margin: 0 auto;
             display: block;
             font-size: 36px;
             margin-top: 50px;
-        }
-
-        .btn-manual:hover, .btn-autopilot:hover {
-            background-color: #AD9500;
         }
         
         @media (min-width: 768px) {
@@ -61,8 +62,9 @@ R"(
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
-                <a href="/autopilot"><button type="button" class="btn btn-autopilot">Autopilot Mode</button></a>
                 <a href="/manual"><button type="button" class="btn btn-manual">Manual Mode</button></a>
+                <a href="/heading"><button type="button" class="btn btn-heading">Heading Mode</button></a>
+                <a href="/waypoint"><button type="button" class="btn btn-waypoint">Waypoint Mode</button></a>
             </div>
         </div>
     </div>

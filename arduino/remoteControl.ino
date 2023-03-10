@@ -5,26 +5,44 @@
 #include <Servo.h>
 #include <ArduinoJson.h>
 
-// Replace with your servo pin
-int servoPin = 5;
-int sailsPin = 4;
-
-Servo rudder;
-Servo sails;
-
-int sailPower = 10;
-
-int sailSetting = 90;
-
-int rudderPower = 10;
-
-int rudderSetting = 90;
-
 // ----------------
 // Set your WiFi SSID and Password here
 // ----------------
 const char *ssid = "XXXXX";
 const char *password = "YYYYY";
+
+// ----------------
+// configure servo pins
+// ----------------
+int servoPin = 5;
+int sailsPin = 4;
+
+// initialize servo pins
+Servo rudder;
+Servo sails;
+
+// initialize variable to determine operation mode
+enum operationMode
+{
+  MANUAL,
+  HEADING,
+  WAYPOINT
+};
+
+// initialize variable used for manual operation
+int sailPower = 10;
+int sailSetting = 90;
+int rudderPower = 10;
+int rudderSetting = 90;
+
+// initialize variables used for automated steering
+int factor = 10;
+
+// initialize variables used for heading mode
+int heading = 0;
+
+// initialize variables used for waypoint mode
+float waypoints[10];
 
 ESP8266WebServer server(80);
 
@@ -32,15 +50,12 @@ const char *webpage =
 #include "webPage.h"
     ;
 
-// Define a global variable to store the coordinates
-float coordinates[10];
-
-void handleCoordinates()
+void handleWaypoints()
 {
   // Flush the coordinates array
   for (int i = 0; i < 10; i++)
   {
-    coordinates[i] = 0;
+    waypoints[i] = 0;
   }
 
   // Parse the JSON data from the request body
@@ -55,10 +70,10 @@ void handleCoordinates()
   }
 
   // Extract the coordinates from the JSON object and store them in the global variable
-  JsonArray arr = doc.as<JsonArray>();
-  for (int i = 0; i < arr.size(); i++)
+  JsonArray newWaypoints = doc.as<JsonArray>();
+  for (int i = 0; i < newWaypoints.size(); i++)
   {
-    coordinates[i] = arr[i];
+    waypoints[i] = newWaypoints[i];
   }
 
   // Send a success response
@@ -120,6 +135,11 @@ void setup(void)
   }
 
   server.on("/", handleRoot);
+
+  server.on("/heading", []()
+            {
+    String response = String(sailSetting);
+    server.send(200, "text/plain", response); });
 
   server.on("/sailSetting", []()
             {
@@ -185,8 +205,11 @@ void setup(void)
     // Send the JSON data as the response
     server.send(200, "application/json", jsonString); });
 
-  // Register the endpoint for the coordinates
-  server.on("/coordinates", HTTP_POST, handleCoordinates);
+  // Register the endpoint for waypoint mode
+  server.on("/waypoint", HTTP_POST, handleWaypoints);
+
+  // Register the endpoint for waypoint mode
+  server.on("/heading", HTTP_POST, handleHeading);
 
   server.onNotFound(handleNotFound);
 
