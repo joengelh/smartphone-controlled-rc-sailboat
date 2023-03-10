@@ -141,16 +141,6 @@ void setup(void)
     String response = String(sailSetting);
     server.send(200, "text/plain", response); });
 
-  server.on("/sailSetting", []()
-            {
-    String response = String(sailSetting);
-    server.send(200, "text/plain", response); });
-
-  server.on("/rudderSetting", []()
-            {
-    String response = String(rudderSetting);
-    server.send(200, "text/plain", response); });
-
   server.on("/reach", []()
             {
     sailSetting += sailPower;
