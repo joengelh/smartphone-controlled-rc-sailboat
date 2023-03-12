@@ -51,7 +51,7 @@ R"(
   <head>
 	<title>Boat Control</title>
     <script>
-    function makeAjaxCall(id) {
+    function makeCall(id) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -64,15 +64,33 @@ R"(
     }
     </script>
     <script>
+    function makePost(endpoint, data) {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // handle the response
+          console.log(this.responseText);
+        }
+      };
+      var url = window.location.origin + '/' + endpoint;
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      var encodedData = Object.keys(data).map(function(key) {
+        return encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+      }).join("&");
+      xhr.send(encodedData);
+    }
+    </script>
+    <script>
     document.addEventListener("keydown", function(event) {
       if (event.key === "w") {
-        makeAjaxCall("reach");
+        makePost("sails", {"direction": "close"});
       } else if (event.key === "a") {
-        makeAjaxCall("port");
+        makePost("rudder", {"direction": "left"})
       } else if (event.key === "s") {
-        makeAjaxCall("run");
+        makePost("sails", {"direction": "open"});
       } else if (event.key === "d") {
-        makeAjaxCall("starboard");
+        makePost("rudder", {"direction": "right"})
       }
     });
     </script>
@@ -114,18 +132,18 @@ R"(
         <div class="row" style="height: 33.33%; padding-top: 1em; padding-bottom: 1em">
             <div class="col-xs-8"></div>
             <div class="col-xs-4" style="text-align: center; height: 100%">
-            <button id="reach" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("reach")'>Reach</button>
+            <button id="reach" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makePost("sails", {"direction": "close"});'>Reach</button>
             </div>
         </div>
         <div class="row" style="height: 33.33%; padding-bottom: 1em">
             <div class="col-xs-4" style="height: 100%; text-align: center">
-            <button id="port" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("port")'>Port</button>
+            <button id="port" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makePost("rudder", {"direction": "left"})'>Port</button>
             </div>
             <div class="col-xs-4" style="height: 100%; text-align: center">
-            <button id="starboard" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("starboard")'>Starboard</button>
+            <button id="starboard" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makePost("rudder", {"direction": "right"})'>Starboard</button>
             </div>
             <div class="col-xs-4" style="height: 100%; text-align: center">
-            <button id="run" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("run")'>Run</button>
+            <button id="run" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makePost("sails", {"direction": "open"});'>Run</button>
             </div>
         </div>
         </div>

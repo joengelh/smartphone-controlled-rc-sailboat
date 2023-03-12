@@ -30,7 +30,7 @@ const char *password = "12345678";
 ESP8266WebServer server(80);
 
 const char *webpage =
-#include "webPage.h"
+#include "html/manual_control.h"
     ;
 
 void handleRoot()
@@ -99,37 +99,39 @@ void setup(void)
     String response = String(rudderSetting);
     server.send(200, "text/plain", response); });
 
-  server.on("/reach", []()
-            {
-    sailSetting += sailPower;
+server.on("/sails", HTTP_POST, [](){
+  if (server.hasArg("direction")) {
+    String direction = server.arg("direction");
+    if (direction == "open") {
+      sailSetting -= sailPower;
+    } else if (direction == "close") {
+      sailSetting += sailPower;
+    }
     sailSetting = constrain(sailSetting, 0, 180);
     sails.write(sailSetting);
-    Serial.println("Take sails closer by: " + String(sailPower) + " from " + String(sailSetting - sailPower) + " to " + String(sailSetting));
-    server.send(200, "text/plain", String(sailSetting)); });
+    Serial.println("Set sails to " + direction + " : " + String(sailPower) + " from " + String(sailSetting - sailPower) + " to " + String(sailSetting));
+    server.send(200, "text/plain", String(sailSetting));
+  } else {
+    server.send(400, "text/plain", "Bad Request");
+  }
+});
 
-  server.on("/run", []()
-            {
-    sailSetting -= sailPower;
-    sailSetting = constrain(sailSetting, 0, 180);
-    sails.write(sailSetting);
-    Serial.println("Open the sails by: " + String(sailPower) + " from " + String(sailSetting + sailPower) + " to " + String(sailSetting));
-    server.send(200, "text/plain", String(sailSetting)); });
-
-  server.on("/starboard", []()
-            {
-    rudderSetting += rudderPower;
+server.on("/rudder", HTTP_POST, [](){
+  if (server.hasArg("direction")) {
+    String direction = server.arg("direction");
+    if (direction == "left") {
+      rudderSetting += rudderPower;
+    } else if (direction == "right") {
+      rudderSetting -= rudderPower;
+    }
     rudderSetting = constrain(rudderSetting, 0, 180);
     rudder.write(rudderSetting);
-    Serial.println("Set rudder to the right by : " + String(rudderPower) + " from " + String(rudderSetting - rudderPower) + " to " + String(rudderSetting));
-    server.send(200, "text/plain", String(rudderSetting)); });
-
-  server.on("/port", []()
-            {
-    rudderSetting -= rudderPower;
-    rudderSetting = constrain(rudderSetting, 0, 180);
-    rudder.write(rudderSetting);
-    Serial.println("Set rudder to the left : " + String(rudderPower) + " from " + String(rudderSetting + rudderPower) + " to " + String(rudderSetting));
-    server.send(200, "text/plain", String(rudderSetting)); });
+    Serial.println("Set rudder to " + direction + " : " + String(rudderPower) + " from " + String(rudderSetting - rudderPower) + " to " + String(rudderSetting));
+    server.send(200, "text/plain", String(rudderSetting));
+  } else {
+    server.send(400, "text/plain", "Bad Request");
+  }
+});
 
   server.onNotFound(handleNotFound);
 
