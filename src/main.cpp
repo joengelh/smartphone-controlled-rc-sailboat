@@ -1,84 +1,37 @@
+#include <Arduino.h>
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <Servo.h>
-#include <ArduinoJson.h>
+
+// Replace with your servo pin
+int servoPin = 5;
+int sailsPin = 4;
+
+Servo rudder;
+Servo sails;
+
+int sailPower = 30;
+
+int sailSetting = 90;
+
+int rudderPower = 30;
+
+int rudderSetting = 90;
 
 // ----------------
 // Set your WiFi SSID and Password here
 // ----------------
-const char *ssid = "XXXXX";
-const char *password = "YYYYY";
-
-// ----------------
-// configure servo pins
-// ----------------
-int servoPin = 5;
-int sailsPin = 4;
-
-// initialize servo pins
-Servo rudder;
-Servo sails;
-
-// initialize variable to determine operation mode
-enum operationMode
-{
-  MANUAL,
-  HEADING,
-  WAYPOINT
-};
-
-// initialize variable used for manual operation
-int sailPower = 10;
-int sailSetting = 90;
-int rudderPower = 10;
-int rudderSetting = 90;
-
-// initialize variables used for automated steering
-int factor = 10;
-
-// initialize variables used for heading mode
-int heading = 0;
-
-// initialize variables used for waypoint mode
-float waypoints[10];
+const char *ssid = "bodenstation";
+const char *password = "12345678";
 
 ESP8266WebServer server(80);
 
 const char *webpage =
 #include "webPage.h"
     ;
-
-void handleWaypoints()
-{
-  // Flush the coordinates array
-  for (int i = 0; i < 10; i++)
-  {
-    waypoints[i] = 0;
-  }
-
-  // Parse the JSON data from the request body
-  DynamicJsonDocument doc(1024);
-  DeserializationError error = deserializeJson(doc, server.arg("plain"));
-
-  // If the JSON is invalid, return a 400 Bad Request error
-  if (error)
-  {
-    server.send(400, "text/plain", "Invalid JSON");
-    return;
-  }
-
-  // Extract the coordinates from the JSON object and store them in the global variable
-  JsonArray newWaypoints = doc.as<JsonArray>();
-  for (int i = 0; i < newWaypoints.size(); i++)
-  {
-    waypoints[i] = newWaypoints[i];
-  }
-
-  // Send a success response
-  server.send(200, "text/plain", "Coordinates saved");
-}
 
 void handleRoot()
 {
@@ -136,9 +89,14 @@ void setup(void)
 
   server.on("/", handleRoot);
 
-  server.on("/heading", []()
+  server.on("/sailSetting", []()
             {
     String response = String(sailSetting);
+    server.send(200, "text/plain", response); });
+
+  server.on("/rudderSetting", []()
+            {
+    String response = String(rudderSetting);
     server.send(200, "text/plain", response); });
 
   server.on("/reach", []()
@@ -172,34 +130,6 @@ void setup(void)
     rudder.write(rudderSetting);
     Serial.println("Set rudder to the left : " + String(rudderPower) + " from " + String(rudderSetting + rudderPower) + " to " + String(rudderSetting));
     server.send(200, "text/plain", String(rudderSetting)); });
-
-  server.onNotFound(handleNotFound);
-
-  server.on("/data", []()
-            {
-    StaticJsonDocument<200> data;
-
-    Serial.println("Data requested");
-    data["rudderSetting"] = rudderSetting;
-    data["rudderPower"] = rudderPower;
-    data["sailSetting"] = sailSetting;
-    data["sailPower"] = sailPower;
-
-    // Serialize the JSON object to a string
-    String jsonString;
-    serializeJson(data, jsonString);
-
-    // Set the content type to JSON
-    server.sendHeader("Content-Type", "application/json");
-
-    // Send the JSON data as the response
-    server.send(200, "application/json", jsonString); });
-
-  // Register the endpoint for waypoint mode
-  server.on("/waypoint", HTTP_POST, handleWaypoints);
-
-  // Register the endpoint for waypoint mode
-  server.on("/heading", HTTP_POST, handleHeading);
 
   server.onNotFound(handleNotFound);
 

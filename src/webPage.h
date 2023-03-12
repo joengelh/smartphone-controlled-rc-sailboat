@@ -5,7 +5,6 @@ R"(
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -51,21 +50,19 @@ R"(
   </head>
   <head>
 	<title>Boat Control</title>
-    <script src="./js/jquery.js"></script>
     <script>
-      $(document).ready(function() {
-        setInterval(function() {
-          $.get("/sailSetting", function(data) {
-            $("#sailSetting").html(data);
-          });
-          $.get("/rudderSetting", function(data) {
-            $("#rudderSetting").html(data);
-          });
-        }, 1000);
-      });
+    function makeAjaxCall(id) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+        // handle the response
+        console.log(this.responseText);
+        }
+    };
+    xhr.open("GET", id, true);
+    xhr.send();
+    }
     </script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script> function makeAjaxCall(url){$.ajax({"url": url})}</script>
     <script>
     document.addEventListener("keydown", function(event) {
       if (event.key === "w") {
@@ -79,32 +76,61 @@ R"(
       }
     });
     </script>
-  </head>
+    <script>
+    function updateSettings() {
+        var sailSetting = document.getElementById("sailSetting");
+        var rudderSetting = document.getElementById("rudderSetting");
+
+        var sailRequest = new XMLHttpRequest();
+        sailRequest.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            sailSetting.innerHTML = this.responseText;
+        }
+        };
+        sailRequest.open("GET", "/sailSetting", true);
+        sailRequest.send();
+
+        var rudderRequest = new XMLHttpRequest();
+        rudderRequest.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            rudderSetting.innerHTML = this.responseText;
+        }
+        };
+        rudderRequest.open("GET", "/rudderSetting", true);
+        rudderRequest.send();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        setInterval(updateSettings, 1000);
+    });
+    </script>
+    </head>
   <body>
     <h1>Boat Control</h1>
     <h2>Sail Setting: <span id="sailSetting"><?php echo $sailSetting; ?></span></h2>
     <h2>Rudder Setting: <span id="rudderSetting"><?php echo $rudderSetting; ?></span></h2>
     <div class="container-fluid">
-      <div class="col-xs-12" style="height: 100vh">
+        <div class="col-xs-12" style="height: 100vh">
         <div class="row" style="height: 33.33%; padding-top: 1em; padding-bottom: 1em">
-          <div class="col-xs-8"></div>
-          <div class="col-xs-4" style="text-align: center; height: 100%">
+            <div class="col-xs-8"></div>
+            <div class="col-xs-4" style="text-align: center; height: 100%">
             <button id="reach" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("reach")'>Reach</button>
-          </div>
+            </div>
         </div>
         <div class="row" style="height: 33.33%; padding-bottom: 1em">
-          <div class="col-xs-4" style="height: 100%; text-align: center">
+            <div class="col-xs-4" style="height: 100%; text-align: center">
             <button id="port" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("port")'>Port</button>
-          </div>
-          <div class="col-xs-4" style="height: 100%; text-align: center">
+            </div>
+            <div class="col-xs-4" style="height: 100%; text-align: center">
             <button id="starboard" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("starboard")'>Starboard</button>
-          </div>
-          <div class="col-xs-4" style="height: 100%; text-align: center">
+            </div>
+            <div class="col-xs-4" style="height: 100%; text-align: center">
             <button id="run" type="button" class="btn btn-default" style="height: 100%; width: 100%" onclick='makeAjaxCall("run")'>Run</button>
-          </div>
+            </div>
         </div>
-      </div>
+        </div>
     </div>
-  </body>
+    </body>
+
 </html>
 )"
